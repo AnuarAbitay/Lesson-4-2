@@ -6,28 +6,33 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import pages.RegistrationFormPage;
 
-import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Selectors.by;
-import static com.codeborne.selenide.Selectors.byText;
-import static com.codeborne.selenide.Selenide.*;
-
 public class RegistrationFormTest {
     RegistrationFormPage registrationFormPage = new RegistrationFormPage();
 
     Faker faker = new Faker();
-    String firstName = faker.name().firstName();
-    String lastName = faker.name().lastName();
-    String userEmail = faker.internet().emailAddress();
-    String userNumber = faker.number().digits(10);
 
-
+    String firstName = faker.name().firstName(),
+           lastName = faker.name().lastName(),
+           userEmail = faker.internet().emailAddress(),
+           userGender = "Male",
+           userNumber = faker.number().digits(10),
+           birthDay = "30",
+           birthMonth = "October",
+           birthYear = "1999",
+           subject = "Math",
+           hobbies = "Sports",
+           pictureName = "1.png",
+           userCurrentAddress = faker.address().fullAddress(),
+           state = "NCR",
+           city = "Delhi",
+           fullName = firstName +" " + lastName,
+           dateOfBirth = String.format("%s %s,%s", birthDay, birthMonth, birthYear),
+           stateCity = state + " " + city;
 
     @BeforeAll
     static void beforeAll() {
-        Configuration.holdBrowserOpen = true;
         Configuration.baseUrl = "https://demoqa.com";
         Configuration.browserSize = "1920x1080";
-
     }
 
     @Test
@@ -36,40 +41,27 @@ public class RegistrationFormTest {
                             .setFirstName(firstName)
                             .setLastName(lastName)
                             .setEmail(userEmail)
-                            .setGender("Male")
-                            .setUserNumber(userNumber);
-
-
-
-
-
-        $("#dateOfBirthInput").click();
-        $(".react-datepicker__month-select").selectOption("October");
-        $(".react-datepicker__year-select").selectOption("1999");
-        $(".react-datepicker__day--030:not(react-datepicker__day--outside-month)").click();
-        $("#subjectsInput").setValue("Math").pressEnter();
-        $("#hobbiesWrapper").$(byText("Sports")).click();
-        $("#uploadPicture").uploadFromClasspath("img/1.png");
-        $("#currentAddress").setValue("8 micro-district");
-        $("#state").click();
-        $("#stateCity-wrapper").$(byText("NCR")).click();
-        $("#city").click();
-        $("#stateCity-wrapper").$(byText("Delhi")).click();
-        $("#submit").click();
-
-
-
-        $(".table-responsive").$(byText("Student Name")).parent().shouldHave(text("Anuar Abitay"));
-
-
-
-
-
-
-
-
-
+                            .setGender(userGender)
+                            .setUserNumber(userNumber)
+                            .setBirthDate(birthDay, birthMonth, birthYear)
+                            .setSubject(subject)
+                            .setHobbies(hobbies)
+                            .uploadPicture("img/" + pictureName)
+                            .setCurrentAddress(userCurrentAddress)
+                            .setState(state)
+                            .setCity(city)
+                            .submit()
+                            .checkResult("Student Name", fullName)
+                            .checkResult("Student Email", userEmail)
+                            .checkResult("Gender", userGender)
+                            .checkResult("Mobile", userNumber)
+                            .checkResult("Date of Birth", dateOfBirth)
+                            .checkResult("Subjects", subject)
+                            .checkResult("Hobbies", hobbies)
+                            .checkResult("Picture", pictureName)
+                            .checkResult("Address", userCurrentAddress)
+                            .checkResult("State and City", stateCity)
+                            .close();
     }
-
 }
 
